@@ -4,133 +4,102 @@ import { Menu, X, User, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import AuthModal from './AuthModal';
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { user, profile, signOut } = useAuth();
-
-  const navigation = [
-    { name: 'Experiences', href: '#experiences' },
-    { name: 'Marketplace', href: '#marketplace' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' }
-  ];
-
-  return (
-    <header className="bg-background/95 backdrop-blur-md border-b border-border sticky top-0 z-50">
+  const {
+    user,
+    profile,
+    signOut
+  } = useAuth();
+  const navigation = [{
+    name: 'Experiences',
+    href: '#experiences'
+  }, {
+    name: 'Marketplace',
+    href: '#marketplace'
+  }, {
+    name: 'About',
+    href: '#about'
+  }, {
+    name: 'Contact',
+    href: '#contact'
+  }];
+  return <header className="bg-background/95 backdrop-blur-md border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="text-2xl font-bold text-primary">Jatra</div>
-            <div className="text-sm text-muted-foreground hidden sm:block">Jharkhand Tourism</div>
+            
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-              >
+            {navigation.map(item => <a key={item.name} href={item.href} className="text-foreground hover:text-primary transition-colors duration-200 font-medium">
                 {item.name}
-              </a>
-            ))}
+              </a>)}
             
             {/* User Authentication Section */}
-            {user ? (
-              <div className="flex items-center gap-3">
+            {user ? <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
                   <span className="text-sm font-medium">{profile?.name || user.email}</span>
-                  {profile?.eco_points_balance !== undefined && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                  {profile?.eco_points_balance !== undefined && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
                       {profile.eco_points_balance} pts
-                    </span>
-                  )}
+                    </span>}
                 </div>
                 <Button variant="outline" size="sm" onClick={signOut}>
                   <LogOut className="w-4 h-4" />
                 </Button>
-              </div>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => setIsAuthModalOpen(true)}>
+              </div> : <Button variant="outline" size="sm" onClick={() => setIsAuthModalOpen(true)}>
                 <User className="w-4 h-4 mr-2" />
                 Sign In
-              </Button>
-            )}
+              </Button>}
           </nav>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden">
+        {isMenuOpen && <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 border-t border-border">
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-colors duration-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+              {navigation.map(item => <a key={item.name} href={item.href} className="block px-3 py-2 text-foreground hover:text-primary transition-colors duration-200" onClick={() => setIsMenuOpen(false)}>
                   {item.name}
-                </a>
-              ))}
+                </a>)}
               
               {/* Mobile User Auth */}
-              {user ? (
-                <div className="px-3 py-2 space-y-2">
+              {user ? <div className="px-3 py-2 space-y-2">
                   <div className="flex items-center gap-2 text-sm">
                     <User className="w-4 h-4" />
                     <span>{profile?.name || user.email}</span>
                   </div>
-                  {profile?.eco_points_balance !== undefined && (
-                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full inline-block">
+                  {profile?.eco_points_balance !== undefined && <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full inline-block">
                       {profile.eco_points_balance} Eco Points
-                    </div>
-                  )}
+                    </div>}
                   <Button variant="outline" size="sm" className="w-full" onClick={signOut}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </Button>
-                </div>
-              ) : (
-                <div className="px-3 py-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full" 
-                    onClick={() => {
-                      setIsAuthModalOpen(true);
-                      setIsMenuOpen(false);
-                    }}
-                  >
+                </div> : <div className="px-3 py-2">
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => {
+              setIsAuthModalOpen(true);
+              setIsMenuOpen(false);
+            }}>
                     <User className="w-4 h-4 mr-2" />
                     Sign In
                   </Button>
-                </div>
-              )}
+                </div>}
             </div>
-          </div>
-        )}
+          </div>}
       </div>
       
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
