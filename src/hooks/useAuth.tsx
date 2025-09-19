@@ -50,20 +50,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         
         // Fetch profile when user signs in
         if (session?.user) {
-          setTimeout(async () => {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .single();
-            
-            setProfile(profileData);
-          }, 0);
+          try {
+            // Small delay to ensure profile is created by trigger
+            setTimeout(async () => {
+              const { data: profileData, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .maybeSingle();
+              
+              if (error) {
+                console.error('Error fetching profile:', error);
+              } else {
+                setProfile(profileData);
+              }
+            }, 500);
+          } catch (error) {
+            console.error('Profile fetch error:', error);
+          }
         } else {
           setProfile(null);
         }
@@ -74,6 +84,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -82,9 +93,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           .from('profiles')
           .select('*')
           .eq('user_id', session.user.id)
-          .single()
-          .then(({ data: profileData }) => {
-            setProfile(profileData);
+          .maybeSingle()
+          .then(({ data: profileData, error }) => {
+            if (error) {
+              console.error('Error fetching initial profile:', error);
+            } else {
+              setProfile(profileData);
+            }
           });
       }
       

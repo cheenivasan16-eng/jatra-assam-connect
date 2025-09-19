@@ -94,13 +94,11 @@ const Admin = () => {
 
             <div className="mt-6 p-4 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
-                <strong>Default Admin Credentials:</strong>
+                <strong>Admin Credentials:</strong>
               </p>
               <p className="text-sm text-muted-foreground">
                 <strong>Email:</strong> admin@jatra.com<br />
                 <strong>Password:</strong> admin@123
-                <br />
-                <small>Note: First-time login requires signing up with these credentials.</small>
               </p>
             </div>
 

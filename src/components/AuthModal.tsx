@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { Chrome, Mail, User } from 'lucide-react';
 
 interface AuthModalProps {
@@ -14,6 +15,7 @@ interface AuthModalProps {
 
 const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const { signUp, signIn, signInWithGoogle } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [signInForm, setSignInForm] = useState({
     email: '',
@@ -30,40 +32,89 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     e.preventDefault();
     setLoading(true);
     
-    const { error } = await signIn(signInForm.email, signInForm.password);
-    
-    if (!error) {
-      onClose();
-      setSignInForm({ email: '', password: '' });
+    try {
+      const { error } = await signIn(signInForm.email, signInForm.password);
+      
+      if (!error) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in to your account.",
+        });
+        onClose();
+        setSignInForm({ email: '', password: '' });
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+      toast({
+        title: "Sign In Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (signUpForm.password !== signUpForm.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Please make sure your passwords match.",
+        variant: "destructive"
+      });
       return;
     }
     
     setLoading(true);
     
-    const { error } = await signUp(signUpForm.email, signUpForm.password, signUpForm.name);
-    
-    if (!error) {
-      onClose();
-      setSignUpForm({ name: '', email: '', password: '', confirmPassword: '' });
+    try {
+      const { error } = await signUp(signUpForm.email, signUpForm.password, signUpForm.name);
+      
+      if (!error) {
+        toast({
+          title: "Account Created!",
+          description: "Welcome to Jatra! You can now explore our platform.",
+        });
+        onClose();
+        setSignUpForm({ name: '', email: '', password: '', confirmPassword: '' });
+      }
+    } catch (error) {
+      console.error('Sign up error:', error);
+      toast({
+        title: "Sign Up Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    await signInWithGoogle();
-    setLoading(false);
-    onClose();
+    
+    try {
+      const { error } = await signInWithGoogle();
+      
+      if (!error) {
+        toast({
+          title: "Welcome!",
+          description: "Successfully signed in with Google.",
+        });
+        onClose();
+      }
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      toast({
+        title: "Google Sign In Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
