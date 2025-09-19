@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import AuthModal from './AuthModal';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
 
   const navigation = [
     { name: 'Experiences', href: '#experiences' },
@@ -34,11 +38,29 @@ const Header = () => {
                 {item.name}
               </a>
             ))}
-            <Link to="/admin">
-              <Button variant="outline" size="sm">
-                Admin Login
+            
+            {/* User Authentication Section */}
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">{profile?.name || user.email}</span>
+                  {profile?.eco_points_balance !== undefined && (
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                      {profile.eco_points_balance} pts
+                    </span>
+                  )}
+                </div>
+                <Button variant="outline" size="sm" onClick={signOut}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => setIsAuthModalOpen(true)}>
+                <User className="w-4 h-4 mr-2" />
+                Sign In
               </Button>
-            </Link>
+            )}
           </nav>
 
           {/* Mobile menu button */}
@@ -67,15 +89,46 @@ const Header = () => {
                   {item.name}
                 </a>
               ))}
-              <Link to="/admin" className="block px-3 py-2">
-                <Button variant="outline" size="sm" className="w-full">
-                  Admin Login
-                </Button>
-              </Link>
+              
+              {/* Mobile User Auth */}
+              {user ? (
+                <div className="px-3 py-2 space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="w-4 h-4" />
+                    <span>{profile?.name || user.email}</span>
+                  </div>
+                  {profile?.eco_points_balance !== undefined && (
+                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full inline-block">
+                      {profile.eco_points_balance} Eco Points
+                    </div>
+                  )}
+                  <Button variant="outline" size="sm" className="w-full" onClick={signOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="px-3 py-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full" 
+                    onClick={() => {
+                      setIsAuthModalOpen(true);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Sign In
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
+      
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </header>
   );
 };

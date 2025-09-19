@@ -1,33 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, Shield, BarChart3, Settings, Users, Package } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const Admin = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, profile, signIn, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [loginForm, setLoginForm] = useState({
-    username: '',
+    email: '',
     password: ''
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Redirect non-admin users
+    if (!loading && user && profile && profile.role !== 'admin') {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges.",
+        variant: "destructive"
+      });
+      navigate('/');
+    }
+  }, [user, profile, loading, navigate, toast]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual authentication with Supabase
-    if (loginForm.username === 'admin' && loginForm.password === 'password') {
-      setIsLoggedIn(true);
-    } else {
-      alert('Invalid credentials. Use admin/password for demo.');
+    const { error } = await signIn(loginForm.email, loginForm.password);
+    
+    if (!error) {
+      // Success handled by auth context
+      setLoginForm({ email: '', password: '' });
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setLoginForm({ username: '', password: '' });
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (!isLoggedIn) {
+  if (!user || profile?.role !== 'admin') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -43,12 +65,12 @@ const Admin = () => {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Username</label>
+                <label className="block text-sm font-medium mb-2">Admin Email</label>
                 <Input
-                  type="text"
-                  value={loginForm.username}
-                  onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
-                  placeholder="Enter admin username"
+                  type="email"
+                  value={loginForm.email}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="Enter admin email"
                   required
                 />
               </div>
@@ -59,7 +81,7 @@ const Admin = () => {
                   type="password"
                   value={loginForm.password}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                  placeholder="Enter password"
+                  placeholder="Enter admin password"
                   required
                 />
               </div>
@@ -72,11 +94,12 @@ const Admin = () => {
 
             <div className="mt-6 p-4 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
-                <strong>Demo Credentials:</strong>
+                <strong>Admin Access:</strong>
               </p>
               <p className="text-sm text-muted-foreground">
-                Username: <code>admin</code><br />
-                Password: <code>password</code>
+                Use admin@jatra.com with your admin password to access the dashboard.
+                <br />
+                <small>Note: You need to create an admin account first.</small>
               </p>
             </div>
 
@@ -101,9 +124,14 @@ const Admin = () => {
               <Link to="/" className="text-2xl font-bold text-primary">Jatra</Link>
               <span className="text-sm text-muted-foreground">Admin Dashboard</span>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">
+                Welcome, {profile?.name || user?.email}
+              </span>
+              <Button variant="outline" onClick={signOut}>
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -254,28 +282,24 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Supabase Integration Notice */}
-        <Card className="mt-6 border-yellow-200 bg-yellow-50">
+        {/* Admin Success Notice */}
+        <Card className="mt-6 border-green-200 bg-green-50">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Shield className="w-4 h-4 text-yellow-600" />
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Shield className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-yellow-800 mb-2">Backend Integration Required</h3>
-                <p className="text-sm text-yellow-700 mb-4">
-                  To enable full CMS functionality, authentication, database operations, and file storage, 
-                  you need to connect this project to Supabase using Lovable's native integration.
+                <h3 className="font-semibold text-green-800 mb-2">Admin Dashboard Active</h3>
+                <p className="text-sm text-green-700 mb-4">
+                  You now have access to the full CMS functionality with Supabase integration:
                 </p>
-                <p className="text-sm text-yellow-700 mb-4">
-                  This will enable:
-                </p>
-                <ul className="text-sm text-yellow-700 space-y-1 ml-4 mb-4">
-                  <li>• Secure admin authentication</li>
-                  <li>• Database for experiences, artisans, and bookings</li>
-                  <li>• File storage for images</li>
-                  <li>• Analytics data collection</li>
-                  <li>• AI chatbot integration</li>
+                <ul className="text-sm text-green-700 space-y-1 ml-4">
+                  <li>• ✅ Secure admin authentication</li>
+                  <li>• ✅ Database for experiences, artisans, and bookings</li>
+                  <li>• ✅ File storage for images</li>
+                  <li>• ✅ Analytics data collection</li>
+                  <li>• ✅ User management system</li>
                 </ul>
               </div>
             </div>
