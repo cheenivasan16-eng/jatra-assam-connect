@@ -14,16 +14,247 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      artisans: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          name: string
+          status: Database["public"]["Enums"]["artisan_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          status?: Database["public"]["Enums"]["artisan_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          status?: Database["public"]["Enums"]["artisan_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          created_at: string | null
+          experience_id: string | null
+          id: string
+          marketplace_item_id: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
+          slot_time: string | null
+          status: Database["public"]["Enums"]["booking_status"] | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          experience_id?: string | null
+          id?: string
+          marketplace_item_id?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          slot_time?: string | null
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          experience_id?: string | null
+          id?: string
+          marketplace_item_id?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          slot_time?: string | null
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_marketplace_item_id_fkey"
+            columns: ["marketplace_item_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eco_points_transactions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          points: number
+          reference_id: string | null
+          type: Database["public"]["Enums"]["eco_points_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points: number
+          reference_id?: string | null
+          type: Database["public"]["Enums"]["eco_points_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points?: number
+          reference_id?: string | null
+          type?: Database["public"]["Enums"]["eco_points_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      experiences: {
+        Row: {
+          available_slots: number | null
+          category: Database["public"]["Enums"]["experience_category"]
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          location: string | null
+          price: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          available_slots?: number | null
+          category: Database["public"]["Enums"]["experience_category"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          price?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          available_slots?: number | null
+          category?: Database["public"]["Enums"]["experience_category"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          price?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_items: {
+        Row: {
+          category: Database["public"]["Enums"]["marketplace_category"]
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number | null
+          stock: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["marketplace_category"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number | null
+          stock?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["marketplace_category"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number | null
+          stock?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          eco_points_balance: number | null
+          id: string
+          name: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          eco_points_balance?: number | null
+          id?: string
+          name?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          eco_points_balance?: number | null
+          id?: string
+          name?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      artisan_status: "pending" | "approved" | "rejected"
+      booking_status: "confirmed" | "cancelled" | "pending"
+      eco_points_type: "earn" | "redeem"
+      experience_category:
+        | "Agriculture"
+        | "Art & Craft"
+        | "Village Life"
+        | "Food"
+      marketplace_category: "handicraft" | "homestay" | "event"
+      payment_status: "pending" | "completed" | "failed"
+      user_role: "admin" | "tourist" | "provider"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +381,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      artisan_status: ["pending", "approved", "rejected"],
+      booking_status: ["confirmed", "cancelled", "pending"],
+      eco_points_type: ["earn", "redeem"],
+      experience_category: [
+        "Agriculture",
+        "Art & Craft",
+        "Village Life",
+        "Food",
+      ],
+      marketplace_category: ["handicraft", "homestay", "event"],
+      payment_status: ["pending", "completed", "failed"],
+      user_role: ["admin", "tourist", "provider"],
+    },
   },
 } as const
