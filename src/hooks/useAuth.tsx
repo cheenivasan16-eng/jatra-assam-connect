@@ -140,10 +140,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    let { error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
+
+    // If it's the admin email and login failed, try to create the admin account
+    if (error && email === 'admin@jatra.com' && password === 'admin@123') {
+      console.log('Admin login failed, attempting to create admin account...');
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name: 'Admin User'
+          }
+        }
+      });
+
+      if (!signUpError) {
+        // Try logging in again after signup
+        const { error: retryError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        error = retryError;
+      } else {
+        error = signUpError;
+      }
+    }
 
     if (error) {
       toast({
